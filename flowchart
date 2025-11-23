@@ -1,0 +1,161 @@
+flowchart TD
+
+%% INGRESSO NEL SISTEMA DI AIUTO
+
+S0([S sente disagio o paura nella relazione])
+S1([S decide di chiedere aiuto])
+
+S0 --> S1
+
+S1 --> A_CAV([Accesso centro antiviolenza o 1522])
+S1 --> A_ER([Accesso Pronto soccorso])
+S1 --> A_SAN([Accesso altri servizi sanitari])
+S1 --> A_SOC([Accesso servizi sociali o sportelli])
+S1 --> A_POL([Accesso polizia])
+S1 --> A_ALT([Accesso tramite persona di fiducia o associazioni])
+
+EM([In qualunque momento S puo chiamare 112 118 Forze Ordine se percepisce pericolo immediato])
+
+S0 --> EM
+S1 --> EM
+
+%% FASE 1 - ACCESSI MULTIPLI E PRIMO CONTATTO
+
+A_ER --> H0([H triage PS codice urgenza e flag percorso violenza])
+A_SAN --> H0
+
+A_SOC --> SS0([SS primo contatto caso sospetta violenza])
+SS0 --> C0
+
+A_POL --> P0([P primo contatto segnalazione])
+P0 --> H0
+P0 --> C0
+
+A_CAV --> C0([CAV accoglienza iniziale])
+
+%% FASE 2 - TRIAGE, RILEVAZIONE VIOLENZA E SICUREZZA IN PS
+
+H0 --> D1{H violenza dichiarata o sospettata}
+D1 --> H_STD([H solo percorso clinico standard])
+D1 --> H_ASK([H domande mirate su possibili violenze])
+D1 --> H_VAW([H percorso violenza di genere attivato])
+
+H_STD --> OUT_INFO([H consegna materiale informativo e contatti 1522])
+
+H_ASK --> D2{Dopo le domande emergono elementi di violenza}
+D2 --> H_STD
+D2 --> H_VAW
+
+H_VAW --> H_INF([H informazione consenso privacy mediazione culturale e accessibilita])
+
+H_INF --> D_MIN{H minori o persone vulnerabili coinvolti}
+D_MIN --> M1([SS attiva tutela minori o servizi sociali])
+D_MIN --> H_ASS([H valutazione clinica e psicosociale])
+
+H_ASS --> S_RP([S esprime percezione del rischio])
+S_RP --> H_RISK([H integra percezione S nella valutazione del rischio sanitario])
+
+%% FASE 3 - TIPO DI VIOLENZA E GESTIONE CLINICA
+
+H_ASS --> D_VS{H sospetto di violenza sessuale recente}
+D_VS --> H_VS([H percorso violenza sessuale recente])
+D_VS --> H_VF([H percorso violenza fisica psicologica o stalking])
+
+H_VS --> H_FOR([H raccolta prove forensi se consenso])
+H_VF --> H_FOR
+
+H_FOR --> D_REF{H obbligo di referto o segnalazione}
+D_REF --> H_REF([H invio referto o segnalazione ad autorita])
+D_REF --> H_DOC([H documenta offre contatto CAV e non segnala se non obbligato])
+
+H_FOR --> H_RISK
+
+H_REF --> P1([P valutazione rischio e azioni di protezione])
+
+%% FASE 4 - VALUTAZIONE DEL RISCHIO E DECISIONI CLINICHE
+
+H_RISK --> D_RISK{Livello di rischio complessivo}
+D_RISK --> R_LOW([Rischio basso o medio])
+D_RISK --> R_HIGH([Rischio alto o molto alto])
+
+R_LOW --> OUT_HOME([H dimissione a domicilio con safety plan e contatti CAV])
+R_HIGH --> NET([NET incontro multi agenzia per alto rischio])
+
+OUT_HOME --> C0
+
+NET --> SET_PROT([NET decide setting protetto per S e minori])
+NET --> PER_MEAS([P misure su PERP allontanamento divieto avvicinamento controllo])
+
+SET_PROT --> D_SET{Scelta fra ricovero o casa rifugio}
+D_SET --> H_RIC([H ricovero protetto in reparto idoneo])
+D_SET --> SHEL_I([CAV casa rifugio primo livello])
+
+H_RIC --> C0
+SHEL_I --> C0
+
+%% FASE 5 - DECISIONI LEGALI E GESTIONE PERPETRATOR
+
+C0 --> C_ACC([CAV ascolto iniziale e analisi bisogni])
+C_ACC --> C_TAKE{S accetta presa in carico CAV}
+
+C_TAKE --> C_INFO([CAV solo informazioni contatti e possibilita di ritorno])
+C_TAKE --> C_PLAN([CAV presa in carico e piano personalizzato])
+
+C_PLAN --> C_LEG{S vuole presentare denuncia ora}
+C_LEG --> C_NO_DEN([CAV supporta senza denuncia informazioni per futuro])
+C_LEG --> C_DEN([CAV accompagna S a P per denuncia])
+
+C_DEN --> P1
+
+P1 --> PER_MEAS
+P1 --> D_P_RISK{P valuta rischio elevato per S e minori}
+D_P_RISK --> NET
+D_P_RISK --> P_MON([P monitoraggio caso senza MARAC se rischio piu basso])
+
+PER_MEAS --> PER_PROG([PERP eventuale programma di trattamento se disponibile])
+
+%% FASE 6 - PRESA IN CARICO CONTINUATIVA E CASA RIFUGIO
+
+C_PLAN --> C_NEED_SHEL{Serve ospitalita protetta}
+C_NEED_SHEL --> C_EXT([CAV percorso in esterno senza casa rifugio])
+C_NEED_SHEL --> SHEL_I
+
+SHEL_I --> C_NEED_LP{Serve casa rifugio secondo livello}
+C_NEED_LP --> SHEL_II([CAV casa rifugio secondo livello medio lungo periodo])
+C_NEED_LP --> C_EXT
+
+C_EXT --> SS1([SS supporto economico abitativo e lavorativo])
+SHEL_II --> SS1
+
+SS1 --> EXIT([Uscita progressiva dal percorso con autonomia e follow up])
+C_INFO --> EXIT
+P_MON --> EXIT
+
+%% CLASSI DI STILE PER ATTORI
+
+classDef survivor fill:#ffe0ec,stroke:#e573a4,color:#000,stroke-width:1px;
+classDef health   fill:#e0f2ff,stroke:#64b5f6,color:#000,stroke-width:1px;
+classDef cav      fill:#e0f5e9,stroke:#66bb6a,color:#000,stroke-width:1px;
+classDef social   fill:#ede7f6,stroke:#7e57c2,color:#000,stroke-width:1px;
+classDef police   fill:#ffecb3,stroke:#ffb300,color:#000,stroke-width:1px;
+classDef net      fill:#d7ccc8,stroke:#6d4c41,color:#000,stroke-width:1px;
+classDef emerg    fill:#ffebee,stroke:#e53935,color:#000,stroke-width:1px;
+classDef perp     fill:#ffcdd2,stroke:#c62828,color:#000,stroke-width:1px;
+
+%% Assegnazione classi
+
+class S0,D0,S1,S_RP survivor;
+
+class EM,A_ER,A_SAN,H0,D1,H_STD,H_ASK,D2,H_VAW,H_INF,D_MIN,H_ASS,D_VS,H_VS,H_VF,H_FOR,H_RISK,D_RISK,R_LOW,R_HIGH,OUT_HOME,SET_PROT,D_SET,H_RIC,H_REF,H_DOC,H0,H_RISK,H_FOR,H_ASS health;
+
+class A_CAV,C0,C_ACC,C_TAKE,C_INFO,C_PLAN,C_NEED_SHEL,C_EXT,SHEL_I,C_NEED_LP,SHEL_II,EXIT cav;
+
+class A_SOC,SS0,M1,SS1 social;
+
+class A_POL,P0,P1,PER_MEAS,PER_PROG,P_MON police;
+
+class NET net;
+
+class EM emerg;
+
+class PER_MEAS,PER_PROG perp;
